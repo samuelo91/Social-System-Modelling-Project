@@ -1,9 +1,8 @@
-# MATLAB Spring 2014 – Research Plan (Template)
-(text between brackets to be removed)
+# MATLAB Spring 2014 – Research Plan
 
-> * Group Name: (be creative!)
+> * Group Name: Geppettos
 > * Group participants names: Philipp Lütolf, Samuel Oberholzer
-> * Project Title: (can be changed)
+> * Project Title: crowd simulation
 
 ## General Introduction
 
@@ -42,6 +41,7 @@ Possible solutions to reduce the forces acting on individual people could be eme
 (Code / Projects Reports of the previous year)
 
 Helbing, Buzna, Johansson, and Werner (2005): Self-Organized Pedestrian Crowd Dynamics: Experiments, Simulations, and Design Solutions
+Helbing, Molnar (1995): Social force model for pedestrian dynamics
 
 
 ## Research Methods
