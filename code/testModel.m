@@ -5,7 +5,8 @@ NOAGENTS = 30;
 START_DISTANCE = 0.2
 dt = 0.1
 
-%agent x, y, vx, vy, desVel, ex, ey, vavg
+%agent = [x, y, vx, vy, desVel, ex, ey, vavg]
+%agents = [agent1; agent2; agent3;...]
 agents = zeros(NOAGENTS,8);
 agentsUpdated = zeros(NOAGENTS,8);
 
