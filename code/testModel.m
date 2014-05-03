@@ -16,8 +16,10 @@ for a = 1:NOAGENTS
     agents(a,:) = agent;
 end
 
+% time loop
 for time = 1:dt:steps
     
+    % agent loop
     for a = 1:NOAGENTS   
         agent = agents(a,:);
         
