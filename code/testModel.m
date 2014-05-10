@@ -4,7 +4,7 @@ function [x,y] = testModel(steps)
 NOAGENTS = 60;
 SPEED_MEAN = 1.1;
 SPEED_DISTR = 0.1;
-dt = 0.05
+dt = 0.05;
 
 %agent = [x, y, vx, vy, desVel, ex, ey, vavg]
 %agents = [agent1; agent2; agent3;...]
@@ -20,6 +20,9 @@ walls = [-5,5,5,5;
          5,10,5,20;
          10,0,10,5;
          10,10,10,20];
+     
+%walls = [walls; makeObstacleRect(7,7,8,8)];
+walls = [walls; makeObstacleTriangle(7,7,8,8,6,9)];
 
 %Initalize agents at the left side with y distance START_DISTANCE apart
 for a = 1:NOAGENTS
@@ -52,7 +55,8 @@ for time = 1:dt:steps
         
         %Wall forces for every agent
         mind = 10000;
-        for w = 1:8
+        [noWalls,dontcare] = size(walls);
+        for w = 1:noWalls
             wall = walls(w,:);
             vectorA = [wall(1),wall(2)] - [wall(3),wall(4)];
             vectorB = [agent(1),agent(2)] - [wall(3),wall(4)];
@@ -162,6 +166,25 @@ pedFx = 3*exp((0.6-norm(d))/0.2)* d(1)/norm(d);
 pedFy = 3*exp((0.6-norm(d))/0.2)* d(2)/norm(d);
 
 end
+
+function obstacle = makeObstacleRect(x,y,x2,y2)
+
+obstacle = [x,y,x,y2;
+            x,y2,x2,y2;
+            x2,y2,x2,y;
+            x2,y,x,y];
+        
+end
+
+function obstacle = makeObstacleTriangle(x,y,x2,y2,x3,y3)
+
+obstacle = [x,y,x2,y2;
+            x2,y2,x3,y3;
+            x3,y3,x,y];
+        
+end
+
+
 
 
 
