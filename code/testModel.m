@@ -111,6 +111,10 @@ for time = 1:dt:steps
     
     plot(agents(:,1),agents(:,2),'Marker', 'o','LineStyle', 'none','MarkerSize', 15)
     set (gca, 'YLimMode', 'Manual', 'YLim', [0 15], 'XLim', [0 15]);
+    [m,n] = size(walls);
+    for w = 1 : m
+        line([walls(w,1);walls(w,3)],[walls(w,2);walls(w,4)])
+    end
     drawnow
     %dt seconds pause so the agents move in 'realtime'
     pause(dt);
