@@ -2,7 +2,6 @@ function [x,y] = testModel(steps)
 
 %Global variables
 NOAGENTS = 60;
-START_DISTANCE = 0.3;
 SPEED_MEAN = 1.1;
 SPEED_DISTR = 0.1;
 dt = 0.05
@@ -13,14 +12,14 @@ agents = zeros(NOAGENTS,8);
 agentsUpdated = zeros(NOAGENTS,8);
 
 %walls form a cross
-walls = [0,5,5,5;
-         0,10,5,10;
+walls = [-5,5,5,5;
+         -5,10,5,10;
          10,5,15,5;
          10,10,15,10;
          5,0,5,5;
-         5,10,5,15;
+         5,10,5,20;
          10,0,10,5;
-         10,10,10,15];
+         10,10,10,20];
 
 %Initalize agents at the left side with y distance START_DISTANCE apart
 for a = 1:NOAGENTS
@@ -28,12 +27,14 @@ for a = 1:NOAGENTS
     % SPEED_MEAN +- SPEED_DISRTR
     speed = SPEED_MEAN + sqrt(SPEED_DISTR)*randn;
     % random number between a and b: a+(b-a)*rand
-    posx = -2 + (2+2)*rand;
-    %posx=0;
     if(a<NOAGENTS/2)
-        agent = [posx,a*START_DISTANCE,0,0,speed,1,0,speed];
+        posx = -2 + (2-(-2))*rand;
+        posy = 5 + (10-5)*rand;
+        agent = [posx,posy,0,0,speed,1,0,speed];
     else
-        agent = [15-posx,(a-NOAGENTS/2)*START_DISTANCE,0,0,speed,-1,0,speed];
+        posx = 5 + (10-5)*rand;
+        posy = -2 + (2-(-2))*rand;
+        agent = [posx,15-posy,0,0,speed,0,-1,speed];
     end
     
     agents(a,:) = agent;
@@ -55,15 +56,28 @@ for time = 1:dt:steps
             wall = walls(w,:);
             vectorA = [wall(1),wall(2)] - [wall(3),wall(4)];
             vectorB = [agent(1),agent(2)] - [wall(3),wall(4)];
-            d = abs(det([vectorA;vectorB])) / norm(vectorA);
+            l2 = norm(vectorA)^2;
+            t = dot(vectorB,vectorA)/l2;
+            if(t<0)
+                n = vectorB;
+                d = norm(n);
+                else if(t>1)
+                    n = [agent(1),agent(2)] - [wall(1),wall(2)];
+                    d = norm(n);
+                    else
+                        n = [-vectorA(2),vectorA(1)];
+                        d = abs(det([vectorA;vectorB])) / norm(vectorA);
+                        n = n/norm(n)*sign(dot(n,vectorB));
+                    end
+            end
+            
             if (d<mind)
                 mind = d;
-                n = [-vectorA(2),vectorA(1)];
-                n = n/norm(n);
+                minn = n;
             end
         end
         
-        [wallFx, wallFy] = wallF(mind, n);
+        [wallFx, wallFy] = wallF(mind, minn);
         agent(3) = agent(3) + dt*wallFx;
         agent(4) = agent(4) + dt*wallFy; 
         
@@ -100,8 +114,8 @@ for time = 1:dt:steps
     
     agents = agentsUpdated;
     
-    plot(agents(:,1),agents(:,2),'Marker', 'o','LineStyle', 'none')
-    set (gca, 'YLimMode', 'Manual', 'YLim', [-5 10], 'XLim', [0 15]);
+    plot(agents(:,1),agents(:,2),'Marker', 'o','LineStyle', 'none','MarkerSize', 15)
+    set (gca, 'YLimMode', 'Manual', 'YLim', [0 15], 'XLim', [0 15]);
     drawnow
     %dt seconds pause so the agents move in 'realtime'
     pause(dt);
