@@ -12,10 +12,15 @@ dt = 0.05
 agents = zeros(NOAGENTS,8);
 agentsUpdated = zeros(NOAGENTS,8);
 
-%Initalize Walls
-walls = zeros(8,4);
-%TODO add walls
-%walls = (0,5,5,5;0,10,5,10;10,5,15,5;10,10,15,10;5,0,5,5;5,10,5,15);
+%walls form a cross
+walls = [0,5,5,5;
+         0,10,5,10;
+         10,5,15,5;
+         10,10,15,10;
+         5,0,5,5;
+         5,10,5,15;
+         10,0,10,5;
+         10,10,10,15];
 
 %Initalize agents at the left side with y distance START_DISTANCE apart
 for a = 1:NOAGENTS
@@ -42,10 +47,25 @@ for time = 1:dt:steps
         agent = agents(a,:);
         
         %Acceleration force of every agent is calculated
-        [accFx,accFy] = accelerationF(agent(6), agent(7), agent(3), agent(4), agent(8), agent(5));
+        [accFx,accFy] = accelerationF(agent(6), agent(7), agent(3), agent(4), agent(8), agent(5)); 
         
         %Wall forces for every agent
+        mind = 10000;
+        for w = 1:8
+            wall = walls(w,:);
+            vectorA = [wall(1),wall(2)] - [wall(3),wall(4)];
+            vectorB = [agent(1),agent(2)] - [wall(3),wall(4)];
+            d = abs(det([vectorA;vectorB])) / norm(vectorA);
+            if (d<mind)
+                mind = d;
+                n = [-vectorA(2),vectorA(1)];
+                n = n/norm(n);
+            end
+        end
         
+        [wallFx, wallFy] = wallF(mind, n);
+        agent(3) = agent(3) + dt*wallFx;
+        agent(4) = agent(4) + dt*wallFy; 
         
         %Simplified Force from other agents (only considered second part of
         %formula)
@@ -56,16 +76,19 @@ for time = 1:dt:steps
                 %Do calc for all other agents except oneself
                 otheragent = agents(i,:);
                 [pedFx,pedFy] = pedestrianF(agent(1),agent(2),otheragent(1),otheragent(2));
+                %Add pedestrian force to velocity
                 agent(3) = agent(3) + dt*pedFx;
                 agent(4) = agent(4) + dt*pedFy;
             end
               
         end
-        
+        %Add acceleration force to velocity
         agent(3) = agent(3) + dt*accFx;
         agent(4) = agent(4) + dt*accFy;
+        %Update position according to new velocity
         agent(1) = agent(1) + dt*agent(3);
         agent(2) = agent(2) + dt*agent(4);
+        %Update average speed
         agent(8) = averageSpeed(agent(8),sqrt(agent(3)^2 + agent(4)^2), time);
         
         %We use a new matrix agentsUpdated so all agents are updated in one
@@ -84,7 +107,6 @@ for time = 1:dt:steps
     pause(dt);
 end
 
-agents
 end
 
 
@@ -110,7 +132,10 @@ end
 
 %force from walls
 
-function [wallFx, wallFy] = wallF(x, y, vx, vywalls)
+function [wallFx, wallFy] = wallF(mind, n)
+
+wallFx = 5*exp((0.3-mind)/0.1) * n(1);
+wallFy = 5*exp((0.3-mind)/0.1) * n(2);
 
 end
 
