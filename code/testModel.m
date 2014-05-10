@@ -11,6 +11,9 @@ dt = 0.05;
 agents = zeros(NOAGENTS,8);
 agentsUpdated = zeros(NOAGENTS,8);
 
+%Init destination zone
+waypoints = [15,5,15,10];
+
 %walls form a cross
 walls = [-5,5,5,5;
          -5,10,5,10;
@@ -49,6 +52,10 @@ for time = 1:dt:steps
     % agent loop
     for a = 1:NOAGENTS   
         agent = agents(a,:);
+        %Set up desired destination for each agent
+        [ex,ey,d] = vectorFromWall(waypoints,agent(1),agent(2));
+        agent(6) = -ex;
+        agent(7) = -ey;
         
         %Acceleration force of every agent is calculated
         [accFx,accFy] = accelerationF(agent(6), agent(7), agent(3), agent(4), agent(8), agent(5)); 
@@ -58,26 +65,10 @@ for time = 1:dt:steps
         [noWalls,dontcare] = size(walls);
         for w = 1:noWalls
             wall = walls(w,:);
-            vectorA = [wall(1),wall(2)] - [wall(3),wall(4)];
-            vectorB = [agent(1),agent(2)] - [wall(3),wall(4)];
-            l2 = norm(vectorA)^2;
-            t = dot(vectorB,vectorA)/l2;
-            if(t<0)
-                n = vectorB;
-                d = norm(n);
-                else if(t>1)
-                    n = [agent(1),agent(2)] - [wall(1),wall(2)];
-                    d = norm(n);
-                    else
-                        n = [-vectorA(2),vectorA(1)];
-                        d = abs(det([vectorA;vectorB])) / norm(vectorA);
-                        n = n/norm(n)*sign(dot(n,vectorB));
-                    end
-            end
-            
+            [vx,vy,d] = vectorFromWall(wall,agent(1),agent(2)); 
             if (d<mind)
                 mind = d;
-                minn = n;
+                minn = [vx,vy];
             end
         end
         
@@ -127,13 +118,10 @@ end
 
 end
 
-
-
 %Average speed of the agent, considering current step in time
 function avgSpeed = averageSpeed(old_avg, newSpeed, time)
 avgSpeed = (old_avg * (time-1) + newSpeed) / time;
 end
-
 
 % nervousness, inital desired velocity is given by desSpeed
 function nerv = nervousness(avgSpeed, desSpeed)
@@ -165,6 +153,29 @@ d = [x,y]-[otherx,othery];
 pedFx = 3*exp((0.6-norm(d))/0.2)* d(1)/norm(d);
 pedFy = 3*exp((0.6-norm(d))/0.2)* d(2)/norm(d);
 
+end
+
+function [vx,vy,d] = vectorFromWall(wall,x,y)
+
+    vectorA = [wall(1),wall(2)] - [wall(3),wall(4)];
+    vectorB = [x,y] - [wall(3),wall(4)];
+    l2 = norm(vectorA)^2;
+    t = dot(vectorB,vectorA)/l2;
+    if(t<0)
+        n = vectorB;
+        d = norm(n);
+    else if(t>1)
+        n = [x,y] - [wall(1),wall(2)];
+        d = norm(n);
+        else
+            n = [-vectorA(2),vectorA(1)];
+            d = abs(det([vectorA;vectorB])) / norm(vectorA);
+            n = n/norm(n)*sign(dot(n,vectorB));
+        end
+    end
+    vx = n(1);
+    vy = n(2);
+    
 end
 
 function obstacle = makeObstacleRect(x,y,x2,y2)
