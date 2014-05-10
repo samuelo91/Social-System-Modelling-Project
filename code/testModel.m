@@ -1,8 +1,8 @@
 function [x,y] = testModel(steps)
 
 %Global variables
-NOAGENTS = 60;
-SPEED_MEAN = 1.1;
+NOAGENTS = 40;
+SPEED_MEAN = 1.3;
 SPEED_DISTR = 0.1;
 dt = 0.05;
 
@@ -10,6 +10,10 @@ dt = 0.05;
 %agents = [agent1; agent2; agent3;...]
 agents = zeros(NOAGENTS,9);
 agentsUpdated = zeros(NOAGENTS,9);
+positionDataX = zeros(NOAGENTS,steps*1/dt);
+positionDataY = zeros(NOAGENTS,steps*1/dt);
+forceData = zeros(15,15,steps*1/dt);
+pplSqData = zeros(15,15,steps*1/dt);
 
 %Init destination zone
 waypointsA = [10,5,10,10;
@@ -18,17 +22,17 @@ waypointsB = [5,5,10,5;
               5,0,10,0];
 
 %walls form a cross
-walls = [-5,5,5,5;
-         -5,10,5,10;
+walls = [-10,5,5,5;
+         -10,10,5,10;
          10,5,15,5;
          10,10,15,10;
          5,0,5,5;
-         5,10,5,20;
+         5,10,5,25;
          10,0,10,5;
-         10,10,10,20];
+         10,10,10,25];
      
 %walls = [walls; makeObstacleRect(7,7,8,8)];
-walls = [walls; makeObstacleTriangle(7,7,8,8,6,9)];
+%walls = [walls; makeObstacleTriangle(7,7,8,8,6,9)];
 
 %Initalize agents at the left side with y distance START_DISTANCE apart
 for a = 1:NOAGENTS
@@ -37,21 +41,22 @@ for a = 1:NOAGENTS
     speed = SPEED_MEAN + sqrt(SPEED_DISTR)*randn;
     % random number between a and b: a+(b-a)*rand
     if(a<NOAGENTS/2)
-        posx = -2 + (2-(-2))*rand;
+        posx = -5 + (2-(-2))*rand;
         posy = 5 + (10-5)*rand;
         agent = [posx,posy,0,0,speed,0,0,speed,1];
     else
         posx = 5 + (10-5)*rand;
-        posy = -2 + (2-(-2))*rand;
+        posy = -5 + (2-(-2))*rand;
         agent = [posx,15-posy,0,0,speed,1,-1,speed,1];
     end
     
     agents(a,:) = agent;
 end
 
+counter=1;
 % time loop
 for time = 1:dt:steps
-    
+    pplSqUnit = zeros(15,15);
     % agent loop
     for a = 1:NOAGENTS   
         agent = agents(a,:);
@@ -64,7 +69,7 @@ for time = 1:dt:steps
         end
         if(d<1)
             [s,dontcare] = size(waypointsA);
-            if (agent(9) < s+1)
+            if (agent(9) < s)
                 agent(9) = agent(9)+1;
                 if(agent(6)==0)
                     [ex,ey,d] = vectorFromWall(waypointsA(agent(9),:),agent(1),agent(2));
@@ -114,6 +119,9 @@ for time = 1:dt:steps
         %Update position according to new velocity
         agent(1) = agent(1) + dt*agent(3);
         agent(2) = agent(2) + dt*agent(4);
+        if(ceil(agent(2)) >0 & ceil(agent(1)) >0 & ceil(agent(2))<=15 & ceil(agent(1))<=15);
+            pplSqUnit(ceil(agent(2)),ceil(agent(1))) = pplSqUnit(ceil(agent(2)),ceil(agent(1)))+1;
+        end
         %Update average speed
         agent(8) = averageSpeed(agent(8),sqrt(agent(3)^2 + agent(4)^2), time);
         
@@ -125,13 +133,31 @@ for time = 1:dt:steps
     end
     
     agents = agentsUpdated;
-    
-    plot(agents(:,1),agents(:,2),'Marker', 'o','LineStyle', 'none','MarkerSize', 15)
+    positionDataX(:,counter) = agents(:,1);
+    positionDataY(:,counter) = agents(:,2);
+    pplSqData (:,:,counter) = pplSqUnit;
+    counter = counter+1;
+
+%     plot(agents(:,1),agents(:,2),'Marker', 'o','LineStyle', 'none','MarkerSize', 10)
+%     set (gca, 'YLimMode', 'Manual', 'YLim', [0 15], 'XLim', [0 15]);
+%     [m,n] = size(walls);
+%     for w = 1 : m
+%         line([walls(w,1);walls(w,3)],[walls(w,2);walls(w,4)])
+%     end
+%     drawnow
+%     %dt seconds pause so the agents move in 'realtime'
+%     pause(dt);
+end
+
+% Plot positions from saved data matrices
+for time = 1:steps/dt
+    plot(positionDataX(:,time),positionDataY(:,time), 'Marker', 'o','LineStyle', 'none','MarkerSize', 10)
     set (gca, 'YLimMode', 'Manual', 'YLim', [0 15], 'XLim', [0 15]);
     [m,n] = size(walls);
     for w = 1 : m
         line([walls(w,1);walls(w,3)],[walls(w,2);walls(w,4)])
     end
+    pplSqData(:,:,time);
     drawnow
     %dt seconds pause so the agents move in 'realtime'
     pause(dt);
@@ -158,7 +184,6 @@ accFy = desVel*desY-vy;
 end
 
 %force from walls
-
 function [wallFx, wallFy] = wallF(mind, n)
 
 wallFx = 5*exp((0.3-mind)/0.1) * n(1);
