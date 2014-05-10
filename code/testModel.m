@@ -6,13 +6,16 @@ SPEED_MEAN = 1.1;
 SPEED_DISTR = 0.1;
 dt = 0.05;
 
-%agent = [x, y, vx, vy, desVel, ex, ey, vavg]
+%agent = [x, y, vx, vy, desVel, type, unused, vavg, waypointNO]
 %agents = [agent1; agent2; agent3;...]
-agents = zeros(NOAGENTS,8);
-agentsUpdated = zeros(NOAGENTS,8);
+agents = zeros(NOAGENTS,9);
+agentsUpdated = zeros(NOAGENTS,9);
 
 %Init destination zone
-waypoints = [15,5,15,10];
+waypointsA = [10,5,10,10;
+              15,5,15,10];
+waypointsB = [5,5,10,5;
+              5,0,10,0];
 
 %walls form a cross
 walls = [-5,5,5,5;
@@ -36,11 +39,11 @@ for a = 1:NOAGENTS
     if(a<NOAGENTS/2)
         posx = -2 + (2-(-2))*rand;
         posy = 5 + (10-5)*rand;
-        agent = [posx,posy,0,0,speed,1,0,speed];
+        agent = [posx,posy,0,0,speed,0,0,speed,1];
     else
         posx = 5 + (10-5)*rand;
         posy = -2 + (2-(-2))*rand;
-        agent = [posx,15-posy,0,0,speed,0,-1,speed];
+        agent = [posx,15-posy,0,0,speed,1,-1,speed,1];
     end
     
     agents(a,:) = agent;
@@ -52,13 +55,27 @@ for time = 1:dt:steps
     % agent loop
     for a = 1:NOAGENTS   
         agent = agents(a,:);
+        
         %Set up desired destination for each agent
-        [ex,ey,d] = vectorFromWall(waypoints,agent(1),agent(2));
-        agent(6) = -ex;
-        agent(7) = -ey;
+        if(agent(6)==0)
+            [ex,ey,d] = vectorFromWall(waypointsA(agent(9),:),agent(1),agent(2));
+        else
+            [ex,ey,d] = vectorFromWall(waypointsB(agent(9),:),agent(1),agent(2));
+        end
+        if(d<1)
+            [s,dontcare] = size(waypointsA);
+            if (agent(9) < s+1)
+                agent(9) = agent(9)+1;
+                if(agent(6)==0)
+                    [ex,ey,d] = vectorFromWall(waypointsA(agent(9),:),agent(1),agent(2));
+                else
+                    [ex,ey,d] = vectorFromWall(waypointsB(agent(9),:),agent(1),agent(2));
+                end
+            end
+        end    
         
         %Acceleration force of every agent is calculated
-        [accFx,accFy] = accelerationF(agent(6), agent(7), agent(3), agent(4), agent(8), agent(5)); 
+        [accFx,accFy] = accelerationF(-ex, -ey, agent(3), agent(4), agent(8), agent(5)); 
         
         %Wall forces for every agent
         mind = 10000;
