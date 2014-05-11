@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-function simulate(positionDataX,positionDataY,pplSqData,walls,mode,steps)
-dt = 0.05;
-framesNo = (steps-1)/dt+1;
-=======
 function simulate(filename,mode)
 %filename has to be a string (e.g. 'test.mat')
 
@@ -11,7 +6,6 @@ h = figure();
 
 vidObj = VideoWriter('video.avi');
 open(vidObj);
->>>>>>> FETCH_HEAD
 
 for time = 1:framesNo
     if(mode==1)
