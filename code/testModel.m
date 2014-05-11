@@ -1,24 +1,25 @@
 function [x,y] = testModel(steps)
 
 %Global variables
-NOAGENTS = 40;
+NOAGENTS = 200;
 SPEED_MEAN = 1.3;
 SPEED_DISTR = 0.1;
 dt = 0.05;
+framesNo = (steps-1)/dt+1;
 
 %agent = [x, y, vx, vy, desVel, type, unused, vavg, waypointNO]
 %agents = [agent1; agent2; agent3;...]
 agents = zeros(NOAGENTS,9);
 agentsUpdated = zeros(NOAGENTS,9);
-positionDataX = zeros(NOAGENTS,steps*1/dt);
-positionDataY = zeros(NOAGENTS,steps*1/dt);
-forceData = zeros(15,15,steps*1/dt);
-pplSqData = zeros(15,15,steps*1/dt);
+positionDataX = zeros(NOAGENTS,framesNo);
+positionDataY = zeros(NOAGENTS,framesNo);
+forceData = zeros(15,15,framesNo);
+pplSqData = zeros(15,15,framesNo);
 
 %Init destination zone
-waypointsA = [10,5,10,10;
+waypointsA = [10,6,10,9;
               15,5,15,10];
-waypointsB = [5,5,10,5;
+waypointsB = [6,5,9,5;
               5,0,10,0];
 
 %walls form a cross
@@ -150,18 +151,23 @@ for time = 1:dt:steps
 end
 
 % Plot positions from saved data matrices
-for time = 1:steps/dt
-    plot(positionDataX(:,time),positionDataY(:,time), 'Marker', 'o','LineStyle', 'none','MarkerSize', 10)
+for time = 1:framesNo
+    hold on
+    imagesc(0:15,0:15,pplSqData(:,:,time),[0,8]); 
+    colormap jet;
+    colorbar
+    plot(positionDataX(:,time),positionDataY(:,time), 'Marker', 'o','LineStyle', 'none','MarkerSize', 10, 'MarkerEdgeColor','k')
     set (gca, 'YLimMode', 'Manual', 'YLim', [0 15], 'XLim', [0 15]);
     [m,n] = size(walls);
     for w = 1 : m
-        line([walls(w,1);walls(w,3)],[walls(w,2);walls(w,4)])
+        line([walls(w,1);walls(w,3)],[walls(w,2);walls(w,4)],'Color','k','LineWidth',2)
     end
-    pplSqData(:,:,time);
-    drawnow
+    %drawnow
     %dt seconds pause so the agents move in 'realtime'
     pause(dt);
+    hold off
 end
+save('test.mat','positionDataX','positionDataY','walls','pplSqData');
 
 end
 
@@ -196,8 +202,8 @@ end
 function [pedFx, pedFy] = pedestrianF(x, y, otherx, othery)
 
 d = [x,y]-[otherx,othery];
-pedFx = 3*exp((0.6-norm(d))/0.2)* d(1)/norm(d);
-pedFy = 3*exp((0.6-norm(d))/0.2)* d(2)/norm(d);
+pedFx = 2*exp((0.6-norm(d))/0.2)* d(1)/norm(d);
+pedFy = 2*exp((0.6-norm(d))/0.2)* d(2)/norm(d);
 
 end
 
