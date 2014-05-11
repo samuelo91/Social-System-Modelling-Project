@@ -5,6 +5,7 @@ load(filename);
 h = figure();
 
 vidObj = VideoWriter('video.avi');
+vidObj.FrameRate = 20;
 open(vidObj);
 
 for time = 1:framesNo

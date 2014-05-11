@@ -1,8 +1,8 @@
-function testModel(steps,filename)
+function testModel(steps,filename, situation)
 %filename has to be a string (e.g. 'test.mat')
 
 %Global variables
-NOAGENTS = 100;
+NOAGENTS = 10;
 SPEED_MEAN = 1.3;
 SPEED_DISTR = 0.1;
 dt = 0.05;
@@ -17,39 +17,79 @@ positionDataY = zeros(NOAGENTS,framesNo);
 forceData = zeros(15,15,framesNo);
 pplSqData = zeros(15,15,framesNo);
 
-%Init destination zone
-waypointsA = [10,6,10,9;
-              15,5,15,10];
-waypointsB = [6,5,9,5;
-              5,0,10,0];
+if(situation == 0)
+    %Init destination zone
+    waypointsA = [10,6,10,9;
+                  15,5,15,10;
+                  25,5,25,10];
+    waypointsB = [6,5,9,5;
+                  5,0,10,0;
+                  5,-10,10,-10];
 
-%walls form a cross
-walls = [-10,5,5,5;
-         -10,10,5,10;
-         10,5,15,5;
-         10,10,15,10;
-         5,0,5,5;
-         5,10,5,25;
-         10,0,10,5;
-         10,10,10,25];
-     
-walls = [walls; makeObstacleRect(7,7,8,8)];
-%walls = [walls; makeObstacleTriangle(7,7,8,8,6,9)];
+    %walls form a cross
+    walls = [-10,5,5,5;
+             -10,10,5,10;
+             10,5,15,5;
+             10,10,15,10;
+             5,0,5,5;
+             5,10,5,25;
+             10,0,10,5;
+             10,10,10,25];
+         
+    %walls = [walls; makeObstacleRect(7,7,8,8)];
+    %walls = [walls; makeObstacleTriangle(7,7,8,8,6,9)];      
+end
+
+if(situation == 1)
+    %Init destination zone
+    waypointsA = [0,7,7,7;
+                  7,7,2,14;
+                  7,7,7,14;
+                  15,7,15,15;
+                  25,7,25,15];
+    waypointsB = [7,7,7,14;
+                  7,7,2,14;
+                  0,7,7,7;
+                  0,0,7,0;
+                  0,-10,7,-10];
+
+    %walls form a curve
+    walls = [0,-10,0,15;
+             0,15,25,15;
+             7,-10,7,7;
+             7,7,25,7];
+end
 
 %Initalize agents at the left side with y distance START_DISTANCE apart
 for a = 1:NOAGENTS
     % Sets the desired speed of the agent in a normaldistribution with
     % SPEED_MEAN +- SPEED_DISRTR
     speed = SPEED_MEAN + sqrt(SPEED_DISTR)*randn;
-    % random number between a and b: a+(b-a)*rand
-    if(a<NOAGENTS/2)
-        posx = -5 + (2-(-2))*rand;
-        posy = 5 + (10-5)*rand;
-        agent = [posx,posy,0,0,speed,0,0,speed,1];
-    else
-        posx = 5 + (10-5)*rand;
-        posy = -5 + (2-(-2))*rand;
-        agent = [posx,15-posy,0,0,speed,1,-1,speed,1];
+    
+    if(situation == 0)
+        % random number between a and b: a+(b-a)*rand
+        if(a<NOAGENTS/2)
+            posx = -5 + (2-(-2))*rand;
+            posy = 5 + (10-5)*rand;
+            agent = [posx,posy,0,0,speed,0,0,speed,1];
+        else
+            posx = 5 + (10-5)*rand;
+            posy = -5 + (2-(-2))*rand;
+            agent = [posx,15-posy,0,0,speed,1,-1,speed,1];
+        end
+    end
+    
+    if(situation == 1)
+        % random number between a and b: a+(b-a)*rand
+        if(a<NOAGENTS/2)
+            posx = 0 + (7-(0))*rand;
+            posy = -5 + (0-(-5))*rand;
+            agent = [posx,posy,0,0,speed,0,0,speed,1];
+        else
+            posx = 15 + (20-15)*rand;
+            posy = 0 + (7-(0))*rand;
+            agent = [posx,15-posy,0,0,speed,1,-1,speed,1];
+        end
     end
     
     agents(a,:) = agent;
@@ -152,22 +192,22 @@ for time = 1:dt:steps
 end
 
 % Plot positions from saved data matrices
-for time = 1:framesNo
-    hold on
-    imagesc(0:15,0:15,pplSqData(:,:,time),[0,8]); 
-    colormap jet;
-    colorbar
-    plot(positionDataX(:,time),positionDataY(:,time), 'Marker', 'o','LineStyle', 'none','MarkerSize', 10, 'MarkerEdgeColor','k')
-    set (gca, 'YLimMode', 'Manual', 'YLim', [0 15], 'XLim', [0 15]);
-    [m,n] = size(walls);
-    for w = 1 : m
-        line([walls(w,1);walls(w,3)],[walls(w,2);walls(w,4)],'Color','k','LineWidth',2)
-    end
-    %drawnow
-    %dt seconds pause so the agents move in 'realtime'
-    pause(dt);
-    hold off
-end
+% for time = 1:framesNo
+%     hold on
+%     imagesc(0:15,0:15,pplSqData(:,:,time),[0,8]); 
+%     colormap jet;
+%     colorbar
+%     plot(positionDataX(:,time),positionDataY(:,time), 'Marker', 'o','LineStyle', 'none','MarkerSize', 10, 'MarkerEdgeColor','k')
+%     set (gca, 'YLimMode', 'Manual', 'YLim', [0 15], 'XLim', [0 15]);
+%     [m,n] = size(walls);
+%     for w = 1 : m
+%         line([walls(w,1);walls(w,3)],[walls(w,2);walls(w,4)],'Color','k','LineWidth',2)
+%     end
+%     %drawnow
+%     %dt seconds pause so the agents move in 'realtime'
+%     pause(dt);
+%     hold off
+% end
 save(filename);
 
 end
