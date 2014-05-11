@@ -1,4 +1,5 @@
-function [x,y] = testModel(steps)
+function testModel(steps,filename)
+%filename has to be a string (e.g. 'test.mat')
 
 %Global variables
 NOAGENTS = 200;
@@ -32,7 +33,7 @@ walls = [-10,5,5,5;
          10,0,10,5;
          10,10,10,25];
      
-%walls = [walls; makeObstacleRect(7,7,8,8)];
+walls = [walls; makeObstacleRect(7,7,8,8)];
 %walls = [walls; makeObstacleTriangle(7,7,8,8,6,9)];
 
 %Initalize agents at the left side with y distance START_DISTANCE apart
@@ -167,7 +168,7 @@ for time = 1:framesNo
     pause(dt);
     hold off
 end
-save('test.mat','positionDataX','positionDataY','walls','pplSqData');
+save(filename);
 
 end
 
@@ -202,8 +203,8 @@ end
 function [pedFx, pedFy] = pedestrianF(x, y, otherx, othery)
 
 d = [x,y]-[otherx,othery];
-pedFx = 2*exp((0.6-norm(d))/0.2)* d(1)/norm(d);
-pedFy = 2*exp((0.6-norm(d))/0.2)* d(2)/norm(d);
+pedFx = 3*exp((0.6-norm(d))/0.2)* d(1)/norm(d);
+pedFy = 3*exp((0.6-norm(d))/0.2)* d(2)/norm(d);
 
 end
 

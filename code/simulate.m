@@ -1,4 +1,11 @@
-function simulate(positionDataX,positionDataY,pplSqData,walls,mode)
+function simulate(filename,mode)
+%filename has to be a string (e.g. 'test.mat')
+
+load(filename);
+h = figure();
+
+vidObj = VideoWriter('video.avi');
+open(vidObj);
 
 for time = 1:framesNo
     if(mode==1)
@@ -19,8 +26,13 @@ for time = 1:framesNo
     if(mode==1)
         hold off
     end
+    
+    currFrame = getframe(h);
+    writeVideo(vidObj,currFrame);
+    
 end
 
+close(vidObj);
 
 end
 
