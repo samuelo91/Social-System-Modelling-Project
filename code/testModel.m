@@ -1,8 +1,10 @@
 function testModel(steps,filename, situation)
 %filename has to be a string (e.g. 'test.mat')
+%situation is either 0 --> cross situation
+%                    1 --> curve situation
 
 %Global variables
-NOAGENTS = 10;
+NOAGENTS = 150;
 SPEED_MEAN = 1.3;
 SPEED_DISTR = 0.1;
 dt = 0.05;
@@ -14,7 +16,6 @@ agents = zeros(NOAGENTS,9);
 agentsUpdated = zeros(NOAGENTS,9);
 positionDataX = zeros(NOAGENTS,framesNo);
 positionDataY = zeros(NOAGENTS,framesNo);
-forceData = zeros(15,15,framesNo);
 pplSqData = zeros(15,15,framesNo);
 
 if(situation == 0)
@@ -180,34 +181,8 @@ for time = 1:dt:steps
     pplSqData (:,:,counter) = pplSqUnit;
     counter = counter+1;
 
-%     plot(agents(:,1),agents(:,2),'Marker', 'o','LineStyle', 'none','MarkerSize', 10)
-%     set (gca, 'YLimMode', 'Manual', 'YLim', [0 15], 'XLim', [0 15]);
-%     [m,n] = size(walls);
-%     for w = 1 : m
-%         line([walls(w,1);walls(w,3)],[walls(w,2);walls(w,4)])
-%     end
-%     drawnow
-%     %dt seconds pause so the agents move in 'realtime'
-%     pause(dt);
 end
 
-% Plot positions from saved data matrices
-% for time = 1:framesNo
-%     hold on
-%     imagesc(0:15,0:15,pplSqData(:,:,time),[0,8]); 
-%     colormap jet;
-%     colorbar
-%     plot(positionDataX(:,time),positionDataY(:,time), 'Marker', 'o','LineStyle', 'none','MarkerSize', 10, 'MarkerEdgeColor','k')
-%     set (gca, 'YLimMode', 'Manual', 'YLim', [0 15], 'XLim', [0 15]);
-%     [m,n] = size(walls);
-%     for w = 1 : m
-%         line([walls(w,1);walls(w,3)],[walls(w,2);walls(w,4)],'Color','k','LineWidth',2)
-%     end
-%     %drawnow
-%     %dt seconds pause so the agents move in 'realtime'
-%     pause(dt);
-%     hold off
-% end
 save(filename);
 
 end

@@ -1,10 +1,12 @@
-function simulate(filename,mode)
+function simulate(filename,mode,savevideo)
 %filename has to be a string (e.g. 'test.mat')
+%mode is either 0 (no background color with people per square) or 1
+%savevideo has to be a string (e.g. 'video.avi')
 
 load(filename);
 h = figure();
 
-vidObj = VideoWriter('video.avi');
+vidObj = VideoWriter(savevideo);
 vidObj.FrameRate = 20;
 open(vidObj);
 
@@ -21,9 +23,7 @@ for time = 1:framesNo
     for w = 1 : m
         line([walls(w,1);walls(w,3)],[walls(w,2);walls(w,4)],'Color','k','LineWidth',2)
     end
-    %drawnow
-    %dt seconds pause so the agents move in 'realtime'
-    pause(dt);
+    drawnow
     if(mode==1)
         hold off
     end
