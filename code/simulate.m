@@ -19,10 +19,16 @@ for time = 1:framesNo
         colormap jet;
         cb = colorbar('vert');
         zlab = get(cb,'ylabel');
-        set(zlab,'String','people per square meter'); 
+        set(zlab,'String','people per square meter','fontsize',14); 
     end
     %plot agents in black
     plot(positionDataX(:,time),positionDataY(:,time), 'Marker', 'o','LineStyle', 'none','MarkerSize', 10, 'MarkerEdgeColor','k')
+    tlhand = get(gca,'title');
+    set(tlhand,'string',sprintf('Agents in xy space over time'),'fontsize',16);
+    xlhand = get(gca,'xlabel');
+    set(xlhand,'string','x-position','fontsize',14);
+    ylhand = get(gca,'ylabel');
+    set(ylhand,'string','y-position','fontsize',14);
     set (gca, 'YLimMode', 'Manual', 'YLim', [0 15], 'XLim', [0 15]);
     [m,n] = size(walls);
     for w = 1 : m
