@@ -43,7 +43,9 @@ if(situation == 0)
          
     %Obstacles are added here:
     %walls = [walls; makeObstacleRect(7,7,8,8)];
-    %walls = [walls; makeObstacleTriangle(7,7,8,8,6,9)];      
+    %walls = [walls; makeObstacleTriangle(7,7,8,8,6,9)];
+    walls = [walls;7,4,8,5;8,6,9,7;10,7,11,8];
+
 end
 
 if(situation == 1)
@@ -65,7 +67,7 @@ if(situation == 1)
          
     %Obstacles are added here: 
     %walls = [walls;5,7,7,9;4,8,6,10;3,9,5,11];
-    walls = [walls;4.5,7.5,6.5,9.5;3,9,5,11];
+    %walls = [walls;4.5,7.5,6.5,9.5;3,9,5,11];
 end
 
 %Initalize agents according to situation
