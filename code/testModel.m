@@ -1,4 +1,4 @@
-function testModel(steps,filename, situation)
+function testModel(steps,filename, situation, noAgents)
 %filename has to be a string (e.g. 'test.mat')
 %situation is either 0 --> cross situation
 %                    1 --> curve situation
@@ -8,13 +8,13 @@ function testModel(steps,filename, situation)
 stream = RandStream.getGlobalStream;
 
 %Global variables
-NOAGENTS = 5;
+NOAGENTS = noAgents;
 SPEED_MEAN = 1.3;
 SPEED_DISTR = 0.1;
 dt = 0.05;
 framesNo = (steps-1)/dt+1;
 
-%agent = [x-position, y-position, x-speed, y-speed, desired Velocity, which start side, waypointNO, average speed]
+%agent = [x-position, y-position, x-speed, y-speed, desired Velocity, type (which start side), waypointNO, average speed]
 %agents = [agent1; agent2; agent3;...]
 agents = zeros(NOAGENTS,8);
 agentsUpdated = zeros(NOAGENTS,8);
@@ -127,11 +127,6 @@ for time = 1:dt:steps
             %agent not at en-destination yet -> set next waypoint
             if (agent(7) < s)
                 agent(7) = agent(7)+1;
-                if(agent(6)==0)
-                    [ex,ey,d] = vectorFromWall(waypointsA(agent(7),:),agent(1),agent(2));
-                else
-                    [ex,ey,d] = vectorFromWall(waypointsB(agent(7),:),agent(1),agent(2));
-                end
             %agent at end-destination -> set agent back into start area
             else
                 speed = SPEED_MEAN + sqrt(SPEED_DISTR)*randn;
@@ -159,6 +154,11 @@ for time = 1:dt:steps
                         agent = [posx,15-posy,-speed,0,speed,1,1,speed];
                     end
                 end
+            end
+            if(agent(6)==0)
+                [ex,ey,d] = vectorFromWall(waypointsA(agent(7),:),agent(1),agent(2));
+            else
+                [ex,ey,d] = vectorFromWall(waypointsB(agent(7),:),agent(1),agent(2));
             end
         end    
         
