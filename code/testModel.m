@@ -65,6 +65,7 @@ if(situation == 1)
          
     %Obstacles are added here: 
     %walls = [walls;5,7,7,9;4,8,6,10;3,9,5,11];
+    walls = [walls;4.5,7.5,6.5,9.5;3,9,5,11];
 end
 
 %Initalize agents according to situation
