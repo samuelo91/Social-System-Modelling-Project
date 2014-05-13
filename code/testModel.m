@@ -42,9 +42,9 @@ if(situation == 0)
              10,10,10,35];
          
     %Obstacles are added here:
-    walls = [walls; makeObstacleRect(7,7,8,8)];
+    walls = [walls; makeObstacleRect(4,7,5,8); makeObstacleRect(7,10,8,11)];
     %walls = [walls; makeObstacleTriangle(7,7,8,8,6,9)];
-    %walls = [walls;7,4,8,5;8,6,9,7;10,7,11,8];
+    %walls = [walls;2,10,4,8; 8,11,10,13];
 
 end
 
