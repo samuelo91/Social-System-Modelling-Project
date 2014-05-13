@@ -53,7 +53,7 @@ if(situation == 1)
                   15,7,15,15;
                   16,7,16,15];
     waypointsB = [7,7,7,13;
-                  1,12,6,6;
+                  1,11,6,6;
                   0,0,7,0;
                   0,-1,7,-1];
 
@@ -97,7 +97,7 @@ for a = 1:NOAGENTS
         %agents at the right side    
         else
             posx = 15 + (20-15)*rand;
-            posy = 0 + (7-(0))*rand;
+            posy = 0 + (8-(0))*rand;
             agent = [posx,15-posy,-speed,0,speed,1,1,speed];
         end
     end
@@ -150,7 +150,7 @@ for time = 1:dt:steps
                         agent = [posx,posy,0,speed,speed,0,1,speed];
                     else
                         posx = 15 + (20-15)*rand;
-                        posy = 0 + (7-(0))*rand;
+                        posy = 0 + (8-(0))*rand;
                         agent = [posx,15-posy,-speed,0,speed,1,1,speed];
                     end
                 end
